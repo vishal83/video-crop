@@ -1,3 +1,4 @@
+
 package com.dd.crop;
 
 import android.content.Context;
@@ -40,7 +41,7 @@ import java.io.IOException;
 public class TextureVideoView extends TextureView implements TextureView.SurfaceTextureListener {
 
     // Indicate if logging is on
-    public static final boolean LOG_ON = true;
+    public static final boolean LOG_ON = false;
 
     // Log tag
     private static final String TAG = TextureVideoView.class.getName();
@@ -166,7 +167,8 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     }
 
     /**
-     * @see android.media.MediaPlayer#setDataSource(android.content.Context, android.net.Uri)
+     * @see android.media.MediaPlayer#setDataSource(android.content.Context,
+     *      android.net.Uri)
      */
     public void setDataSource(Context context, Uri uri) {
         initPlayer();
@@ -208,7 +210,7 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
                             updateTextureViewSize();
                         }
                     }
-            );
+                    );
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
@@ -221,7 +223,16 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
                 }
             });
 
-            // don't forget to call MediaPlayer.prepareAsync() method when you use constructor for
+            mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    log("Error is happening");
+                    return false;
+                }
+            });
+            // don't forget to call MediaPlayer.prepareAsync() method when you
+            // use constructor for
             // creating MediaPlayer
             mMediaPlayer.prepareAsync();
 
@@ -251,10 +262,9 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     }
 
     /**
-     * Play or resume video. Video will be played as soon as view is available and media player is
-     * prepared.
-     *
-     * If video is stopped or ended and play() method was called, video will start over.
+     * Play or resume video. Video will be played as soon as view is available
+     * and media player is prepared. If video is stopped or ended and play()
+     * method was called, video will start over.
      */
     public void play() {
         if (!mIsDataSourceSet) {
@@ -289,7 +299,7 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
         if (mState == State.END || mState == State.STOP) {
             log("play() was called but video already ended, starting over.");
             mState = State.PLAY;
-            mMediaPlayer.seekTo(0);
+//            mMediaPlayer.seekTo(0);
             mMediaPlayer.start();
             return;
         }
@@ -298,8 +308,17 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
         mMediaPlayer.start();
     }
 
+    public boolean isPlaying() {
+        if (mMediaPlayer == null) {
+            return false;
+        } else {
+            return mMediaPlayer.isPlaying();
+        }
+    }
+
     /**
-     * Pause video. If video is already paused, stopped or ended nothing will happen.
+     * Pause video. If video is already paused, stopped or ended nothing will
+     * happen.
      */
     public void pause() {
         if (mState == State.PAUSE) {
@@ -324,8 +343,8 @@ public class TextureVideoView extends TextureView implements TextureView.Surface
     }
 
     /**
-     * Stop video (pause and seek to beginning). If video is already stopped or ended nothing will
-     * happen.
+     * Stop video (pause and seek to beginning). If video is already stopped or
+     * ended nothing will happen.
      */
     public void stop() {
         if (mState == State.STOP) {
